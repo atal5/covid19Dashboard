@@ -3,7 +3,8 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from . import covid_conf_analysis as cv
+#from . import covid_conf_analysis as cv
+import covid_conf_analysis as cv
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -260,8 +261,8 @@ app.layout = dbc.Container(
         html.Hr(),
         dbc.Row(
             [
-                dbc.Col(graph5(),md=6),
-                dbc.Col(generate_country_active_rec_dead_table(),md=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
+                dbc.Col(graph5(),md=12,lg=6),
+                dbc.Col(generate_country_active_rec_dead_table(),md=12,lg=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
             ],
             align="center",
 
