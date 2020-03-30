@@ -21,6 +21,8 @@ colors = {
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = 'Covid 19 Dashboard'
 
+server = app.server
+
 covid = cv.covid_conf_analysis()
 covid_raw_ts = covid.get_raw_data()
 covid_countries = list(sorted(covid.get_country_list()))
@@ -69,10 +71,10 @@ def fig_dead_rec_active_piechart():
     total_dead = covid.get_overall_dead()
     total_recovered = covid.get_overall_recovered()
     total_confirmed = total_active + total_dead +  total_recovered
-    df = pd.DataFrame(data = [total_active,total_recovered,total_dead], 
+    df = pd.DataFrame(data = [total_active,total_recovered,total_dead],
                         index = ['Active','Recovered','Dead'],
                         columns=['Total'])
-    fig = px.pie(df, values='Total', 
+    fig = px.pie(df, values='Total',
              names=df.index,
              labels=['Active','Recovered','Dead'],
              hole=.4,
@@ -119,7 +121,7 @@ def get_page_heading_subtitle():
                                          style={
                                              'textAlign':'center',
                                              'color':colors['text']
-                                         })                                
+                                         })
 
 def create_dropdown_list(normal_list=['T1','T2']):
     dropdown_list = []
@@ -141,7 +143,7 @@ def graph2():
     return  dcc.Graph(
                             id='example-graph2',
                             figure=fig('India')
-                        )   
+                        )
 
 def graph3():
     return  dcc.Graph(
@@ -153,13 +155,13 @@ def graph4():
     return  dcc.Graph(
                             id='example-graph4',
                             figure=fig_compare_countries_daily_rate(cntry1='US',cntry2='Italy',cntry3='India')
-                        )                                                                            
+                        )
 
 def graph5():
     return  dcc.Graph(
                             id='example-graph5',
                             figure=fig_dead_rec_active_piechart()
-                        )                                                                            
+                        )
 
 
 def create_dropdown_list_num_top_country(normal_list=['T1','T2']):
@@ -259,15 +261,15 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(graph5(),md=6),
-                dbc.Col(generate_country_active_rec_dead_table(),md=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})   
+                dbc.Col(generate_country_active_rec_dead_table(),md=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
             ],
             align="center",
-            
+
         ),
         html.Hr(),
         dbc.Row(
             [
-                
+
                 dbc.Col(vw_how_many_country_dropdown(id=3), md=4),
                 dbc.Col(vw_show_china_flag_dropdown(id=4), md=4),
                 dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
@@ -276,7 +278,7 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
-                
+
                 dbc.Col(graph3(), md=12),
                 #dbc.Col(graph5(), md=4)
             ],
@@ -292,7 +294,7 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
-                
+
                 dbc.Col(graph1(), md=6),
                 dbc.Col(graph2(), md=6),
             ],
@@ -309,7 +311,7 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
-                
+
                 dbc.Col(graph4(), md=12)
             ],
             align="center",
@@ -321,7 +323,7 @@ app.layout = dbc.Container(
 # app.layout = html.Div(style={'overflowX': 'scroll'},children=[
 #     html.H4(children='Covid 19 Dataset'),
 #     generate_table(covid_raw_ts)
-    
+
 # ])
 
 
@@ -368,7 +370,7 @@ def update_output_div(top_value,china_flag,log_flag,n_clicks):
         log_flag=True
     elif log_flag =='False':
         log_flag = False
-    
+
     print(top_value,china_flag,log_flag)
     return fig_world_trend(top=top_value,exclude_china=china_flag,log_trans=log_flag)
 
