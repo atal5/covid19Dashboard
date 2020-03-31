@@ -241,7 +241,7 @@ def vw_show_log_graph_flag_dropdown(id):
                     ])
 
 
-app.layout = dbc.Container(
+layout = dbc.Container(
     [
         dbc.Row(
             [
@@ -341,6 +341,7 @@ app.layout = dbc.Container(
 #     html.Div(id='my-div')
 # ])
 
+app.layout = layout
 
 @app.callback(
     Output(component_id='example-graph1',component_property='figure'),
