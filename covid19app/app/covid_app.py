@@ -1,9 +1,12 @@
+import sys
+# insert at 1, 0 is the script path (or '' in REPL)
+sys.path.insert(1, '/path/to/application/app/folder')
 import dash
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from .covid_conf_analysis import covid_conf_analysis as cv
+from covid_conf_analysis import covid_conf_analysis as cv
 #import covid_conf_analysis as cv
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
