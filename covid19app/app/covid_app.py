@@ -241,90 +241,91 @@ def vw_show_log_graph_flag_dropdown(id):
                     ])
 
 
-layout = dbc.Container(
-    [
-        dbc.Row(
-            [
-                dbc.Col(get_page_heading_title(),md=12)
-            ],
-            align="center",
-            style=get_page_heading_style()
-        ),
-        dbc.Row(
-            [
-                dbc.Col(get_page_heading_subtitle(),md=12)
-            ],
-            align="center",
-            style=get_page_heading_style()
-        ),
-        html.Hr(),
-        dbc.Button("Refresh Dataset", color="primary", className="mr-1",id="refresh-button"),
-        dbc.Row([
-            dbc.Col(html.Label('Button Pressed',id='button-pressed-label'),md=4)
-        ]),
-        html.Hr(),
-        dbc.Row(
-            [
-                dbc.Col(graph5(),md=12,lg=6),
-                dbc.Col(generate_country_active_rec_dead_table(),md=12,lg=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
-            ],
-            align="center",
+def generate_layout():
+    layout = dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(get_page_heading_title(),md=12)
+                ],
+                align="center",
+                style=get_page_heading_style()
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(get_page_heading_subtitle(),md=12)
+                ],
+                align="center",
+                style=get_page_heading_style()
+            ),
+            html.Hr(),
+            dbc.Button("Refresh Dataset", color="primary", className="mr-1",id="refresh-button"),
+            dbc.Row([
+                dbc.Col(html.Label('Button Pressed',id='button-pressed-label'),md=4)
+            ]),
+            html.Hr(),
+            dbc.Row(
+                [
+                    dbc.Col(graph5(),md=12,lg=6),
+                    dbc.Col(generate_country_active_rec_dead_table(),md=12,lg=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
+                ],
+                align="center",
 
-        ),
-        html.Hr(),
-        dbc.Row(
-            [
+            ),
+            html.Hr(),
+            dbc.Row(
+                [
 
-                dbc.Col(vw_how_many_country_dropdown(id=3), md=4),
-                dbc.Col(vw_show_china_flag_dropdown(id=4), md=4),
-                dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
-            ],
-            align="center",
-        ),
-        dbc.Row(
-            [
+                    dbc.Col(vw_how_many_country_dropdown(id=3), md=4),
+                    dbc.Col(vw_show_china_flag_dropdown(id=4), md=4),
+                    dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
+                ],
+                align="center",
+            ),
+            dbc.Row(
+                [
 
-                dbc.Col(graph3(), md=12),
-                #dbc.Col(graph5(), md=4)
-            ],
-            align="center",
-        ),
-        html.Hr(),
-        dbc.Row(
-            [
-                dbc.Col(get_country_dropdown(id=1),md=6),
-                dbc.Col(get_country_dropdown(id=2),md=6)
-            ],
-            #style={'width': '30px'},
-        ),
-        dbc.Row(
-            [
+                    dbc.Col(graph3(), md=12),
+                    #dbc.Col(graph5(), md=4)
+                ],
+                align="center",
+            ),
+            html.Hr(),
+            dbc.Row(
+                [
+                    dbc.Col(get_country_dropdown(id=1),md=6),
+                    dbc.Col(get_country_dropdown(id=2),md=6)
+                ],
+                #style={'width': '30px'},
+            ),
+            dbc.Row(
+                [
 
-                dbc.Col(graph1(), md=6),
-                dbc.Col(graph2(), md=6),
-            ],
-            align="center",
-        ),
-        html.Hr(),
-        dbc.Row(
-            [
-                dbc.Col(get_country_dropdown(id=6),md=4),
-                dbc.Col(get_country_dropdown(id=7),md=4),
-                dbc.Col(get_country_dropdown(id=8),md=4),
-            ],
-            #style={'width': '30px'},
-        ),
-        dbc.Row(
-            [
+                    dbc.Col(graph1(), md=6),
+                    dbc.Col(graph2(), md=6),
+                ],
+                align="center",
+            ),
+            html.Hr(),
+            dbc.Row(
+                [
+                    dbc.Col(get_country_dropdown(id=6),md=4),
+                    dbc.Col(get_country_dropdown(id=7),md=4),
+                    dbc.Col(get_country_dropdown(id=8),md=4),
+                ],
+                #style={'width': '30px'},
+            ),
+            dbc.Row(
+                [
 
-                dbc.Col(graph4(), md=12)
-            ],
-            align="center",
-        ),
-    ],
-    fluid=True,
-)
-
+                    dbc.Col(graph4(), md=12)
+                ],
+                align="center",
+            ),
+        ],
+        fluid=True,
+    )
+    return layout
 # app.layout = html.Div(style={'overflowX': 'scroll'},children=[
 #     html.H4(children='Covid 19 Dataset'),
 #     generate_table(covid_raw_ts)
@@ -341,7 +342,7 @@ layout = dbc.Container(
 #     html.Div(id='my-div')
 # ])
 
-app.layout = layout
+app.layout = generate_layout
 
 @app.callback(
     Output(component_id='example-graph1',component_property='figure'),
