@@ -379,14 +379,27 @@ def update_output_div(top_value,china_flag,log_flag,n_clicks):
     return fig_world_trend(top=top_value,exclude_china=china_flag,log_trans=log_flag)
 
 @app.callback(
-    Output('button-pressed-label', "children"), [Input("refresh-button", "n_clicks")]
+    Output(component_id='example-graph5',component_property='figure'), 
+    [Input("refresh-button", "n_clicks")]
 )
 def on_button_click(n):
     if n is None:
-        return "Click to refresh data from source"
+        #return "Click to refresh data from source"
+        return fig_dead_rec_active_piechart()
     else:
         get_covid_data()
-        return "Data refreshed from source."
+        return fig_dead_rec_active_piechart()
+
+# @app.callback(
+#     Output(component_id='example-graph5',component_property='figure'), 
+#     [Input("refresh-button", "n_clicks")]
+# )
+# def on_button_click(n):
+#     if n is None:
+#         return fig_dead_rec_active_piechart()
+#     else:
+#         get_covid_data()
+#         return fig_dead_rec_active_piechart()
 
 
 @app.callback(
@@ -397,6 +410,8 @@ def on_button_click(n):
 )
 def update_output_div(cntry1,cntry2,cntry3):
     return fig_compare_countries_daily_rate(cntry1,cntry2,cntry3)
+
+
 
 
 if __name__ == '__main__':
