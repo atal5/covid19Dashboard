@@ -75,6 +75,7 @@ def fig_dead_rec_active_piechart():
     total_dead = covid.get_overall_dead()
     total_recovered = covid.get_overall_recovered()
     total_confirmed = total_active + total_dead +  total_recovered
+    print("updating figure pie chart")
     df = pd.DataFrame(data = [total_active,total_recovered,total_dead],
                         index = ['Active','Recovered','Dead'],
                         columns=['Total'])
@@ -383,6 +384,7 @@ def update_output_div(top_value,china_flag,log_flag,n_clicks):
     [Input("refresh-button", "n_clicks")]
 )
 def on_button_click(n):
+    print("Updatding Pie Chart")
     if n is None:
         #return "Click to refresh data from source"
         return fig_dead_rec_active_piechart()
