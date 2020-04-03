@@ -52,6 +52,13 @@ class covid_conf_analysis():
         self.update_data()
         return self.get_latest_overall_total(self.covid_dead_ts)
 
+    def get_latest_dead(self):
+        dead_data = self.get_raw_dead_data()
+        df = dead_data.iloc[:,[1,-1]].groupby('Country/Region').sum()
+        df.columns = ['num_dead']
+        df = df.sort_values('num_dead',ascending=True)
+        return df
+
     def get_overall_recovered(self):
         self.update_data()
         return self.get_latest_overall_total(self.covid_recovered_ts) 

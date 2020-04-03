@@ -1,6 +1,7 @@
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '/path/to/application/app/folder')
+#sys.path.insert(1, 'C:/Users/ragha/Developer/covid19/GITHUB/covid19app/app/covid_conf_analysis')
+#sys.path.append("path_to_directory")
 import dash
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
@@ -83,13 +84,31 @@ def fig_dead_rec_active_piechart():
              names=df.index,
              labels=['Active','Recovered','Dead'],
              hole=.4,
-             title='Overall Situation - Total Cases: {}'.format(total_confirmed),
+             title='Overall Situation - Total Cases: {:,}'.format(total_confirmed),
              color=df.index,color_discrete_map={'Active':'indianred',
                                  'Recovered':'mediumseagreen',
                                  'Dead':'black'})
     fig.update_traces(textposition='inside', textinfo='percent+label',
                         textfont_size=10,showlegend=True,
                         insidetextorientation='horizontal')
+    return fig
+
+def fig_dead_by_country():
+    df = covid.get_latest_dead()
+    total_dead = df.num_dead.sum()
+    df = df[df.num_dead > 100]
+    fig = px.bar(df, x="num_dead", y=df.index, orientation='h',text='num_dead')
+    fig.update_layout(title=f'Number of dead by country (>100), Total Dead: {total_dead:,}',title_x=0.5,
+                    yaxis_title='',xaxis_title='',
+                    yaxis_tickfont = dict(size=10),
+                    #xaxis_autorange='reversed',
+                    xaxis_showticklabels=False,
+                    xaxis_showgrid=False,
+                    #xaxis_title=False,
+                    yaxis_side='left',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_traces(texttemplate='%{text:.2s}', textposition='outside',marker_color='black')
     return fig
 
 def generate_country_active_rec_dead_table(max_rows=250):
@@ -168,6 +187,11 @@ def graph5():
                             figure=fig_dead_rec_active_piechart()
                         )
 
+def graph6():
+    return  dcc.Graph(
+                            id='example-graph6',
+                            figure=fig_dead_by_country()
+                        )
 
 def create_dropdown_list_num_top_country(normal_list=['T1','T2']):
     dropdown_list = []
@@ -258,19 +282,26 @@ def generate_layout():
                 align="center",
                 style=get_page_heading_style()
             ),
-            html.Hr(),
-            dbc.Button("Refresh Dataset", color="primary", className="mr-1",id="refresh-button"),
-            dbc.Row([
-                dbc.Col(html.Label('Button Pressed',id='button-pressed-label'),md=4)
-            ]),
+            # html.Hr(),
+            # dbc.Button("Refresh Dataset", color="primary", className="mr-1",id="refresh-button"),
+            # dbc.Row([
+            #     dbc.Col(html.Label('Button Pressed',id='button-pressed-label'),md=4)
+            # ]),
             html.Hr(),
             dbc.Row(
-                [
+                [                
                     dbc.Col(graph5(),md=12,lg=6),
-                    dbc.Col(generate_country_active_rec_dead_table(),md=12,lg=6,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
+                    dbc.Col(graph6(),md=12,lg=6),
+        
                 ],
                 align="center",
 
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(generate_country_active_rec_dead_table(),md=12,lg=12,style={'maxHeight': '400px', 'overflowY': 'scroll','position':'sticky','top':'0'})
+                ],
+                align="center",
             ),
             html.Hr(),
             dbc.Row(
@@ -364,10 +395,10 @@ def update_output_div(input_value):
     Output(component_id='example-graph3',component_property='figure'),
     [Input(component_id='my-id3',component_property='value'),
     Input(component_id='my-id4',component_property='value'),
-    Input(component_id='my-id5',component_property='value'),
-    Input("refresh-button", "n_clicks")]
+    Input(component_id='my-id5',component_property='value')]
+    #Input("refresh-button", "n_clicks")]
 )
-def update_output_div(top_value,china_flag,log_flag,n_clicks):
+def update_output_div(top_value,china_flag,log_flag):
     if china_flag=='True':
         china_flag=True
     elif china_flag =='False':
