@@ -13,6 +13,7 @@ import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
+import numpy as np
 
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 external_stylesheets = [dbc.themes.BOOTSTRAP]
@@ -46,24 +47,31 @@ def fig(cntry='US'):
     current_cases = covid_country.iloc[-1,0]
     fig = go.Figure(
         data=[go.Bar(y=covid_country.iloc[:,0],x=covid_country.index)],
-        layout_title_text="Confirmed covid Cases in {}: {}".format(cntry,current_cases)
+        layout_title_text="Confirmed covid Cases in {}: {:,}".format(cntry,current_cases)
     )
+    #fig = px.line(df, y='#cases', x='date',color='country', title=title)
     return fig
 
 def fig_world_trend(top=10,exclude_china=False,log_trans=False):
     #get_covid_data()
     total = covid.get_world_total()
     top_ts = covid.plot_top_countries(top,exclude_china,log_trans)
-    df = top_ts.unstack().reset_index()
+    df = top_ts[40:].unstack().reset_index()
     df.columns = ['country','date','#cases']
-    title = 'World Trend - Total Confirmed Cases: {}'.format(total)
-    fig = px.line(df, y='#cases', x='date',color='country', title=title)
+    title = 'World Trend - Total Confirmed Cases: {:,}'.format(total)
+    fig = px.line(df, y='#cases', x='date',color='country', title=title, height=800)
     return fig
 
 def fig_compare_countries_daily_rate(cntry1='US',cntry2='Italy',cntry3='India'):
     df = covid.get_three_countries_daily_rate_for_comparison(cntry1,cntry2,cntry3)
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.sort_values('date').iloc[-30:,:]
+    df = df.reset_index(drop=True)
     title = f"Comparison of {cntry1}, {cntry2} and {cntry3} daily cases as a % of country total"
     fig = px.bar(df, y='dailycases', x='date',color='country', title=title, barmode='group')
+    fig.update_layout(yaxis_fixedrange = True,
+                    xaxis_fixedrange = True,
+                    xaxis_tickmode='linear',title_x=0.5,height=600)
     return fig
 
 
@@ -91,6 +99,7 @@ def fig_dead_rec_active_piechart():
     fig.update_traces(textposition='inside', textinfo='percent+label',
                         textfont_size=10,showlegend=True,
                         insidetextorientation='horizontal')
+    fig.update_layout(title_x=0.5)
     return fig
 
 def fig_dead_by_country():
@@ -101,13 +110,16 @@ def fig_dead_by_country():
     fig.update_layout(title=f'Number of dead by country (>100), Total Dead: {total_dead:,}',title_x=0.5,
                     yaxis_title='',xaxis_title='',
                     yaxis_tickfont = dict(size=10),
+                    yaxis_fixedrange = True,
+                    xaxis_fixedrange = True,
                     #xaxis_autorange='reversed',
                     xaxis_showticklabels=False,
                     xaxis_showgrid=False,
                     #xaxis_title=False,
                     yaxis_side='left',
                     paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)')
+                    plot_bgcolor='rgba(0,0,0,0)'
+                    )
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside',marker_color='black')
     return fig
 
@@ -123,6 +135,92 @@ def generate_country_active_rec_dead_table(max_rows=250):
             ]) for i in range(min(len(dataframe),max_rows))
         ])
     ],bordered=True,striped=True,responsive=True)
+
+
+def fig_logarithmic_trend():
+    df = covid.get_dataset_for_log_trend()
+    new_df = df.dropna(axis='columns',how='all')
+    new_df = new_df.dropna(axis='rows',how='all')
+    new_df = new_df.drop('Date',axis='columns')
+    log_df = new_df.apply(np.log10,axis='columns')
+    df = log_df.iloc[:50,5:]
+    fig = go.Figure()
+    for col in df.columns:
+        fig.add_trace(go.Scatter(x=df.index, y=df[col],
+                            mode='lines',
+                            name=col))
+        
+
+    fig.add_trace(go.Scatter(x=log_df[:15].index, y=log_df.iloc[:15,0],
+                            mode='lines',
+                            name='',line=dict(color='grey',dash='dot'),showlegend=False))
+
+    fig.add_trace(go.Scatter(x=log_df[:30].index, y=log_df.iloc[:30,3],
+                            mode='lines',
+                            name='',line=dict(color='grey',dash='dot'),showlegend=False))
+
+    fig.add_trace(go.Scatter(x=log_df[:40].index, y=log_df.iloc[:40,2],
+                            mode='lines',
+                            name='',line=dict(color='grey',dash='dot'),showlegend=False))
+
+    fig.add_trace(go.Scatter(x=log_df[:45].index, y=log_df.iloc[:45,4],
+                            mode='lines',
+                            name='',line=dict(color='grey',dash='dot'),showlegend=False))
+
+    fig.add_trace(go.Scatter(x=log_df[:50].index, y=log_df.iloc[:50,1],
+                            mode='lines',
+                            name='',line=dict(color='grey',dash='dot'),showlegend=False))
+
+    annotations = []
+
+    # Adding labels
+
+    annotations.append(dict(x=14, y=6.25,
+                                xanchor='left', yanchor='middle',
+                                text='Doubles Every Day',
+                                font=dict(family='Arial',
+                                            size=16),
+                                showarrow=False))
+                                
+    annotations.append(dict(x=29, y=6.4,
+                                xanchor='left', yanchor='middle',
+                                text='... Every 2 Days',
+                                font=dict(family='Arial',
+                                            size=16),
+                                showarrow=False))
+
+    annotations.append(dict(x=39, y=5.95,
+                                xanchor='left', yanchor='middle',
+                                text='... Every 3 Days',
+                                font=dict(family='Arial',
+                                            size=16),
+                                showarrow=False))
+
+    annotations.append(dict(x=44, y=4.7,
+                                xanchor='left', yanchor='middle',
+                                text='... Every 5 Days',
+                                font=dict(family='Arial',
+                                            size=16),
+                                showarrow=False))
+
+    annotations.append(dict(x=47, y=4.05,
+                                xanchor='left', yanchor='middle',
+                                text='... Every Week',
+                                font=dict(family='Arial',
+                                            size=16),
+                                showarrow=False))
+        
+        
+    # annotations.append(dict(xref='paper', yref='paper', x=0,y=1,
+    #                             xanchor='center', yanchor='top',
+    #                             text='Data Source: John Hopkins CCSE',
+    #                             font=dict(family='Arial',
+    #                                         size=12,
+    #                                         color='rgb(150,150,150)'),
+    #                             showarrow=False))
+    #print(annotations)
+    fig.update_layout(height=800,annotations=annotations,xaxis_title='Days after first 100 cases', yaxis_showticklabels=False,yaxis_title='Growth Rate')
+    return fig
 
 
 def get_page_heading_style():
@@ -184,14 +282,29 @@ def graph4():
 def graph5():
     return  dcc.Graph(
                             id='example-graph5',
-                            figure=fig_dead_rec_active_piechart()
+                            figure=fig_dead_rec_active_piechart(),
+                            config={
+                                        'displayModeBar': False
+                                    }
                         )
 
 def graph6():
     return  dcc.Graph(
                             id='example-graph6',
-                            figure=fig_dead_by_country()
+                            figure=fig_dead_by_country(),
+                            config={
+                                        'displayModeBar': False
+                                    }
                         )
+
+def graph7():
+    return  dcc.Graph(
+                            id='example-graph7',
+                            figure=fig_logarithmic_trend(),
+                            config={
+                                        'displayModeBar': False
+                                    }
+                        )                        
 
 def create_dropdown_list_num_top_country(normal_list=['T1','T2']):
     dropdown_list = []
@@ -249,7 +362,7 @@ def vw_show_china_flag_dropdown(id):
                         html.Label('Exclude China'),
                         dcc.Dropdown(id='my-id'+str(id),
                             options=create_dropdown_list_num_top_china_flag(),
-                            value='False'
+                            value='True'
                         ),
                         html.Div(id='my-div'+str(id))
                     ])
@@ -308,16 +421,22 @@ def generate_layout():
                 [
 
                     dbc.Col(vw_how_many_country_dropdown(id=3), md=4),
-                    dbc.Col(vw_show_china_flag_dropdown(id=4), md=4),
-                    dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
+                    dbc.Col(vw_show_china_flag_dropdown(id=4), md=4)
+                    #dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
                 ],
                 align="center",
             ),
             dbc.Row(
                 [
 
-                    dbc.Col(graph3(), md=12),
-                    #dbc.Col(graph5(), md=4)
+                    dbc.Col(graph3(),md=12,lg=6)
+                ],
+                align="center",
+            ),
+            dbc.Row(
+                [
+
+                    dbc.Col(graph7(),md=12,lg=6)
                 ],
                 align="center",
             ),
@@ -349,7 +468,7 @@ def generate_layout():
             dbc.Row(
                 [
 
-                    dbc.Col(graph4(), md=12)
+                    dbc.Col(graph4(),md=12,lg=6)
                 ],
                 align="center",
             ),
@@ -394,23 +513,22 @@ def update_output_div(input_value):
 @app.callback(
     Output(component_id='example-graph3',component_property='figure'),
     [Input(component_id='my-id3',component_property='value'),
-    Input(component_id='my-id4',component_property='value'),
-    Input(component_id='my-id5',component_property='value')]
+    Input(component_id='my-id4',component_property='value')]
     #Input("refresh-button", "n_clicks")]
 )
-def update_output_div(top_value,china_flag,log_flag):
+def update_output_div(top_value,china_flag):
     if china_flag=='True':
         china_flag=True
     elif china_flag =='False':
         china_flag = False
 
-    if log_flag=='True':
-        log_flag=True
-    elif log_flag =='False':
-        log_flag = False
+    # if log_flag=='True':
+    #     log_flag=True
+    # elif log_flag =='False':
+    #     log_flag = False
 
-    print(top_value,china_flag,log_flag)
-    return fig_world_trend(top=top_value,exclude_china=china_flag,log_trans=log_flag)
+    #print(top_value,china_flag,log_flag)
+    return fig_world_trend(top=top_value,exclude_china=china_flag)
 
 # @app.callback(
 #     Output(component_id='example-graph5',component_property='figure'), 

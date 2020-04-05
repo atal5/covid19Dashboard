@@ -227,6 +227,37 @@ class covid_conf_analysis():
         #final_df = final_df.rename(columns={"Country/Region": "Country"})
         return final_df.sort_values(['Active'],ascending=False)
 
+    #double every n days
+    def get_series_double_every_n_days(self,n=2):
+        doubled= [100]
+        num=100
+        for i in range(1,48):
+            num = 100 * (2**((i)/n))
+            doubled.append(num)
+        #print(doubled)
+        doubled_df = pd.DataFrame(doubled)
+        col_name = 'Double every '+str(n)+' days'
+        doubled_df.columns = [col_name]
+        return doubled_df
+
+    def get_dataset_for_log_trend(self,countries_list =['US','India','Pakistan','Italy','Germany','Singapore','Korea, South','Spain','United kingdom','Japan','China']):
+        #countries_list = covid.get_country_list()
+        doubled_df = self.get_series_double_every_n_days(1)
+        doubled_df_7 = self.get_series_double_every_n_days(7)
+        doubled_df_3 = self.get_series_double_every_n_days(3)
+        doubled_df_2 = self.get_series_double_every_n_days(2)
+        doubled_df_5 = self.get_series_double_every_n_days(5)
+        df = pd.DataFrame()
+        df = pd.concat([doubled_df,doubled_df_7,doubled_df_3,doubled_df_2,doubled_df_5],axis='columns')
+        for country in countries_list:
+            ts = self.get_data_for_cntry(country)
+            ts = ts[ts.iloc[:,0]>=100].reset_index()
+            #print(ts)
+            col_name = country
+            ts.columns = ['Date',col_name]
+            df = pd.concat([df,ts],axis='columns')
+        return df
+
 if __name__ == '__main__':
     url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
     covid = covid_conf_analysis(url)
