@@ -1,4 +1,6 @@
 import sys
+sys.path.append('C:/Users/ragha/Developer/covid19/GITHUB/covid19app/app/data_handling/')
+#print(sys.path)
 # insert at 1, 0 is the script path (or '' in REPL)
 #sys.path.insert(1, 'C:/Users/ragha/Developer/covid19/GITHUB/covid19app/app/covid_conf_analysis')
 #sys.path.append("path_to_directory")
@@ -7,8 +9,8 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from .covid_conf_analysis import covid_conf_analysis as cv
-#import covid_conf_analysis as cv
+#from covid_conf_analysis import covid_conf_analysis as cv
+import covid_conf_analysis as cv
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import plotly.express as px
@@ -59,7 +61,7 @@ def fig_world_trend(top=10,exclude_china=False,log_trans=False):
     df = top_ts[40:].unstack().reset_index()
     df.columns = ['country','date','#cases']
     title = 'World Trend - Total Confirmed Cases: {:,}'.format(total)
-    fig = px.line(df, y='#cases', x='date',color='country', title=title, height=800)
+    fig = px.line(df, y='#cases', x='date',color='country', title=title,height=600,)
     return fig
 
 def fig_compare_countries_daily_rate(cntry1='US',cntry2='Italy',cntry3='India'):
@@ -106,10 +108,12 @@ def fig_dead_by_country():
     df = covid.get_latest_dead()
     total_dead = df.num_dead.sum()
     df = df[df.num_dead > 100]
+    df = df.sort_values('num_dead',ascending=False)[:25]
+    df = df.sort_values('num_dead',ascending=True)
     fig = px.bar(df, x="num_dead", y=df.index, orientation='h',text='num_dead')
-    fig.update_layout(title=f'Number of dead by country (>100), Total Dead: {total_dead:,}',title_x=0.5,
+    fig.update_layout(title=f'Number of dead by country (Top 25), Total Dead: {total_dead:,}',title_x=0.5,
                     yaxis_title='',xaxis_title='',
-                    yaxis_tickfont = dict(size=10),
+                    yaxis_tickfont = dict(size=9),
                     yaxis_fixedrange = True,
                     xaxis_fixedrange = True,
                     #xaxis_autorange='reversed',
@@ -219,7 +223,50 @@ def fig_logarithmic_trend():
     #                                         color='rgb(150,150,150)'),
     #                             showarrow=False))
     #print(annotations)
-    fig.update_layout(height=800,annotations=annotations,xaxis_title='Days after first 100 cases', yaxis_showticklabels=False,yaxis_title='Growth Rate')
+    fig.update_layout(height=600,annotations=annotations,xaxis_title='Days after first 100 cases', yaxis_showticklabels=False,yaxis_title='Growth Rate')
+    return fig
+
+def fig_world_map():
+    df = covid.get_raw_data()
+    df = df.iloc[:,[2,3,-1]]
+    df.columns = ['Lat','Long','Cases']
+    mapbox_access_token = "pk.eyJ1IjoiYXRhbDUiLCJhIjoiY2s4b3VneTh1MDBrcDNkcGJudHdka2ExdyJ9.994kXBWoW2pmJQQaZQT9cg"
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scattermapbox(lat = df["Lat"],lon=df["Long"],mode="markers",marker=go.scattermapbox.Marker(
+                size = df["Cases"]/3000,sizemin=5,color= "red" #df["Cases"],colorscale="reds"
+            ),
+            text=df["Cases"],name="Cases Reported"
+                                    
+            ))
+
+    fig.add_trace(go.Scattermapbox(lat = [38,40],lon=[59,127],mode="markers",marker=go.scattermapbox.Marker(
+                size = 15,color= "green" #df["Cases"],colorscale="reds"
+            ),
+            text="No Cases Reported",name="No Cases Reported"
+                                    
+            ))
+
+    #38.9697° N, 59.5563°
+
+    fig.update_layout(
+        hovermode='closest',
+        showlegend=False,
+        height=800,
+        mapbox=dict(
+            accesstoken=mapbox_access_token,
+            bearing=0,
+            center=go.layout.mapbox.Center(
+                lat=37,
+                lon=-95
+            ),
+            pitch=0,
+            zoom=2,
+            style = 'mapbox://styles/mapbox/light-v9'
+        
+        )
+    )
     return fig
 
 
@@ -304,7 +351,16 @@ def graph7():
                             config={
                                         'displayModeBar': False
                                     }
-                        )                        
+                        )    
+
+def graph8():
+    return  dcc.Graph(
+                            id='example-graph8',
+                            figure=fig_world_map(),
+                            config={
+                                        'displayModeBar': True
+                                    }
+                        )                                              
 
 def create_dropdown_list_num_top_country(normal_list=['T1','T2']):
     dropdown_list = []
@@ -378,23 +434,31 @@ def vw_show_log_graph_flag_dropdown(id):
                     ])
 
 
+def generate_page_heading_rows():
+    main_header =  dbc.Row(
+                            [
+                                dbc.Col(get_page_heading_title(),md=12)
+                            ],
+                            align="center",
+                            style=get_page_heading_style()
+                        )
+    subtitle_header = dbc.Row(
+                            [
+                                dbc.Col(get_page_heading_subtitle(),md=12)
+                            ],
+                            align="center",
+                            style=get_page_heading_style()
+                        )
+    header = (main_header,subtitle_header)
+    return header
+
+
 def generate_layout():
+    page_header = generate_page_heading_rows()
     layout = dbc.Container(
         [
-            dbc.Row(
-                [
-                    dbc.Col(get_page_heading_title(),md=12)
-                ],
-                align="center",
-                style=get_page_heading_style()
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(get_page_heading_subtitle(),md=12)
-                ],
-                align="center",
-                style=get_page_heading_style()
-            ),
+            page_header[0],
+            page_header[1],
             # html.Hr(),
             # dbc.Button("Refresh Dataset", color="primary", className="mr-1",id="refresh-button"),
             # dbc.Row([
@@ -408,6 +472,17 @@ def generate_layout():
         
                 ],
                 align="center",
+
+            ),
+            html.Hr(),
+            dbc.Row(
+                [                
+                    dbc.Col(graph8(),md=12),
+        
+                ],
+                align="center",
+                justify="start"
+            
 
             ),
             dbc.Row(
@@ -425,26 +500,30 @@ def generate_layout():
                     #dbc.Col(vw_show_log_graph_flag_dropdown(id=5), md=4)
                 ],
                 align="center",
+                justify="center",
             ),
             dbc.Row(
                 [
 
-                    dbc.Col(graph3(),md=12,lg=6)
+                    dbc.Col(graph3(),md=12,lg=dict(size=8),xl=dict(size=8))
                 ],
                 align="center",
+                justify="center",
+
             ),
             dbc.Row(
                 [
 
-                    dbc.Col(graph7(),md=12,lg=6)
+                    dbc.Col(graph7(),md=12,lg=dict(size=8),xl=dict(size=8))
                 ],
                 align="center",
+                justify="center",
             ),
             html.Hr(),
             dbc.Row(
                 [
-                    dbc.Col(get_country_dropdown(id=1),md=6),
-                    dbc.Col(get_country_dropdown(id=2),md=6)
+                    dbc.Col(get_country_dropdown(id=1),md=dict(size=6)),
+                    dbc.Col(get_country_dropdown(id=2),md=dict(size=6))
                 ],
                 #style={'width': '30px'},
             ),
@@ -468,7 +547,7 @@ def generate_layout():
             dbc.Row(
                 [
 
-                    dbc.Col(graph4(),md=12,lg=6)
+                    dbc.Col(graph4(),md=dict(size=12),lg=dict(size=6,offset=3))
                 ],
                 align="center",
             ),
@@ -476,21 +555,7 @@ def generate_layout():
         fluid=True,
     )
     return layout
-# app.layout = html.Div(style={'overflowX': 'scroll'},children=[
-#     html.H4(children='Covid 19 Dataset'),
-#     generate_table(covid_raw_ts)
 
-# ])
-
-
-# app.layout = html.Div([
-#     html.Label('Dropdown'),
-#     dcc.Dropdown(id='my-id',
-#         options=create_dropdown_list(covid_countries),
-#         value='US'
-#     ),
-#     html.Div(id='my-div')
-# ])
 
 app.layout = generate_layout
 
