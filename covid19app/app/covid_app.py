@@ -62,6 +62,7 @@ def fig_world_trend(top=10,exclude_china=False,log_trans=False):
     df.columns = ['country','date','#cases']
     title = 'World Trend - Total Confirmed Cases: {:,}'.format(total)
     fig = px.line(df, y='#cases', x='date',color='country', title=title,height=600,)
+    fig.update_layout(title_x=0.5)
     return fig
 
 def fig_compare_countries_daily_rate(cntry1='US',cntry2='Italy',cntry3='India'):
@@ -223,7 +224,7 @@ def fig_logarithmic_trend():
     #                                         color='rgb(150,150,150)'),
     #                             showarrow=False))
     #print(annotations)
-    fig.update_layout(height=600,annotations=annotations,xaxis_title='Days after first 100 cases', yaxis_showticklabels=False,yaxis_title='Growth Rate')
+    fig.update_layout(title='Doubling Rate',title_x=0.5,height=600,annotations=annotations,xaxis_title='Days after first 100 cases', yaxis_showticklabels=False,yaxis_title='Growth Rate')
     return fig
 
 def fig_world_map():
