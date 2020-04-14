@@ -236,7 +236,7 @@ def fig_world_map():
     fig = go.Figure()
 
     fig.add_trace(go.Scattermapbox(lat = df["Lat"],lon=df["Long"],mode="markers",marker=go.scattermapbox.Marker(
-                size = df["Cases"]/3000,sizemin=5,color= "red" #df["Cases"],colorscale="reds"
+                size = abs(df["Cases"])/3000,sizemin=5,color= "red" #df["Cases"],colorscale="reds"
             ),
             text=df["Cases"],name="Cases Reported"
                                     
@@ -318,7 +318,7 @@ def graph2():
 def graph3():
     return  dcc.Graph(
                             id='example-graph3',
-                            figure=fig_world_trend(top=8,exclude_china=False,log_trans=False)
+                            figure=fig_world_trend(top=12,exclude_china=False,log_trans=False)
                         )
 
 def graph4():
@@ -408,7 +408,7 @@ def vw_how_many_country_dropdown(id):
                         html.Label('Top n Countries'),
                         dcc.Dropdown(id='my-id'+str(id),
                             options=create_dropdown_list_num_top_country(),
-                            value=5
+                            value=12
                         ),
                         html.Div(id='my-div'+str(id))
                     ])
