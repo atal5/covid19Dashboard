@@ -1,5 +1,5 @@
 import sys
-sys.path.append('C:/Users/ragha/Developer/covid19/GITHUB/covid19app/app/data_handling/')
+sys.path.append('D:/Developer/covid19/GITHUB/covid19app/app/data_handling')
 #print(sys.path)
 # insert at 1, 0 is the script path (or '' in REPL)
 #sys.path.insert(1, 'C:/Users/ragha/Developer/covid19/GITHUB/covid19app/app/covid_conf_analysis')
@@ -359,7 +359,7 @@ def graph8():
                             id='example-graph8',
                             figure=fig_world_map(),
                             config={
-                                        'displayModeBar': T99rue
+                                        'displayModeBar': False
                                     }
                         )
 
@@ -419,7 +419,7 @@ def vw_show_china_flag_dropdown(id):
                         html.Label('Exclude China'),
                         dcc.Dropdown(id='my-id'+str(id),
                             options=create_dropdown_list_num_top_china_flag(),
-                            value='True'
+                            value='False'
                         ),
                         html.Div(id='my-div'+str(id))
                     ])
