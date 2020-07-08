@@ -154,7 +154,7 @@ def fig_logarithmic_trend():
         fig.add_trace(go.Scatter(x=df.index, y=df[col],
                             mode='lines',
                             name=col))
-        
+
 
     fig.add_trace(go.Scatter(x=log_df[:15].index, y=log_df.iloc[:15,0],
                             mode='lines',
@@ -186,7 +186,7 @@ def fig_logarithmic_trend():
                                 font=dict(family='Arial',
                                             size=16),
                                 showarrow=False))
-                                
+
     annotations.append(dict(x=29, y=6.4,
                                 xanchor='left', yanchor='middle',
                                 text='... Every 2 Days',
@@ -214,8 +214,8 @@ def fig_logarithmic_trend():
                                 font=dict(family='Arial',
                                             size=16),
                                 showarrow=False))
-        
-        
+
+
     # annotations.append(dict(xref='paper', yref='paper', x=0,y=1,
     #                             xanchor='center', yanchor='top',
     #                             text='Data Source: John Hopkins CCSE',
@@ -236,17 +236,17 @@ def fig_world_map():
     fig = go.Figure()
 
     fig.add_trace(go.Scattermapbox(lat = df["Lat"],lon=df["Long"],mode="markers",marker=go.scattermapbox.Marker(
-                size = abs(df["Cases"])/3000,sizemin=5,color= "red" #df["Cases"],colorscale="reds"
+                size = abs(df["Cases"])*0.00001,sizemin=5,color= "red" #df["Cases"],colorscale="reds"
             ),
             text=df["Cases"],name="Cases Reported"
-                                    
+
             ))
 
     fig.add_trace(go.Scattermapbox(lat = [38,40],lon=[59,127],mode="markers",marker=go.scattermapbox.Marker(
                 size = 15,color= "green" #df["Cases"],colorscale="reds"
             ),
             text="No Cases Reported",name="No Cases Reported"
-                                    
+
             ))
 
     #38.9697° N, 59.5563°
@@ -265,7 +265,7 @@ def fig_world_map():
             pitch=0,
             zoom=2,
             style = 'mapbox://styles/mapbox/light-v9'
-        
+
         )
     )
     return fig
@@ -352,16 +352,16 @@ def graph7():
                             config={
                                         'displayModeBar': False
                                     }
-                        )    
+                        )
 
 def graph8():
     return  dcc.Graph(
                             id='example-graph8',
                             figure=fig_world_map(),
                             config={
-                                        'displayModeBar': True
+                                        'displayModeBar': T99rue
                                     }
-                        )                                              
+                        )
 
 def create_dropdown_list_num_top_country(normal_list=['T1','T2']):
     dropdown_list = []
@@ -467,23 +467,23 @@ def generate_layout():
             # ]),
             html.Hr(),
             dbc.Row(
-                [                
+                [
                     dbc.Col(graph5(),md=12,lg=6),
                     dbc.Col(graph6(),md=12,lg=6),
-        
+
                 ],
                 align="center",
 
             ),
             html.Hr(),
             dbc.Row(
-                [                
+                [
                     dbc.Col(graph8(),md=12),
-        
+
                 ],
                 align="center",
                 justify="start"
-            
+
 
             ),
             dbc.Row(
@@ -597,7 +597,7 @@ def update_output_div(top_value,china_flag):
     return fig_world_trend(top=top_value,exclude_china=china_flag)
 
 # @app.callback(
-#     Output(component_id='example-graph5',component_property='figure'), 
+#     Output(component_id='example-graph5',component_property='figure'),
 #     [Input("refresh-button", "n_clicks")]
 # )
 # def on_button_click(n):
@@ -610,7 +610,7 @@ def update_output_div(top_value,china_flag):
 #         return fig_dead_rec_active_piechart()
 
 # @app.callback(
-#     Output(component_id='example-graph5',component_property='figure'), 
+#     Output(component_id='example-graph5',component_property='figure'),
 #     [Input("refresh-button", "n_clicks")]
 # )
 # def on_button_click(n):
